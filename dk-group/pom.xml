@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.hehenian</groupId>
-		<artifactId>hehenian-dk</artifactId>
+		<groupId>com.kdr</groupId>
+		<artifactId>kdr-dk</artifactId>
 		<version>1.0</version>
 	</parent>
 
-	<groupId>com.hehenian.dk</groupId>
+	<groupId>com.kdr.dk</groupId>
 	<artifactId>dk-group</artifactId>
 	<packaging>war</packaging>
 	<version>1.0</version>
@@ -18,12 +18,12 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.hehenian.dk</groupId>
+			<groupId>com.kdr.dk</groupId>
 			<artifactId>dk-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.hehenian.dk</groupId>
+			<groupId>com.kdr.dk</groupId>
 			<artifactId>dk-memcache</artifactId>
 			<version>${project.version}</version>
 		</dependency>
