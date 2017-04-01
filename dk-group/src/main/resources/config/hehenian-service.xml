@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.hehenian.biz.common" />
+	 <!-- 用户登录filter -->
+    <bean id="userLoginFilter" class="com.hehenian.app.filter.UserLoginFilter" >
+        <property name="loginView" value="${hhn.login}"/>
+        <property name="mobileLoginView" value="${hhnMobile.loginUrl}"/>
+    </bean>
+
+	<bean id="sessionManager" class="com.hehenian.common.memcache.MemcachedSessionManager">
+		<property name="sessionKey" value="hhyds" />
+		<property name="sessionTimeout" value="120" />
+		<property name="memcachedServers" value="${memcache.session.address}" />
+		<property name="cookieDomain" value="${memcache.session.cookieDomain}" />
+	</bean>
+	
+	<bean id="sessionIdGenerator" class="com.hehenian.common.session.id.JdkUUIDGenerator" />
+	
+	<!-- ================= properties file configuration start ============================== -->
+	
+	<bean  
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:${catalina.home}/conf/hehenian.properties</value>
+			</list>
+		</property>
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+	
+	<bean id="serviceProxy" class="com.caucho.hessian.client.HessianProxyFactory">
+		<property name="connectTimeout" value="100000" />
+		<property name="readTimeout" value="100000" />
+		<property name="overloadEnabled" value="true" />
+	</bean>
+	<!-- 还款表查询 -->
+	<bean id="loanRepaymentService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${repay.service.url}/loanRepaymentService" />
+		<property name="serviceInterface" value="com.hehenian.common.repay.ILoanRepaymentService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 订单服务 -->
+	<bean id="orderService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${order.service.url}/orderService" />
+		<property name="serviceInterface" value="com.hehenian.common.order.IOrderService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 工作服务 -->
+	<bean id="jobService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${order.service.url}/jobService" />
+		<property name="serviceInterface" value="com.hehenian.common.job.IJobService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 代理人验证表 -->
+	<bean id="loanProxyCheckService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${order.service.url}/loanProxyCheckService" />
+		<property name="serviceInterface" value="com.hehenian.common.order.ILoanProxyCheckService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 用户帐号贷款信息 -->
+	<bean id="loanUserPersonService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${user.service.url}/loanUserPersonService" />
+		<property name="serviceInterface" value="com.hehenian.common.account.ILoanUserPersonService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 用户联系人管理  -->
+	<bean id="loanRelationService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${user.service.url}/loanRelationService" />
+		<property name="serviceInterface" value="com.hehenian.common.account.ILoanRelationService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 用户帐号信息 -->
+	<bean id="loanUserService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${user.service.url}/loanUserService" />
+		<property name="serviceInterface" value="com.hehenian.common.account.ILoanUserService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!--  防止并发重复操作， 在缓存里设置共享锁 -->
+	<bean id="generatorCodeService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${cache.service.url}/generatorCodeService" />
+		<property name="serviceInterface" value="com.hehenian.common.loan.IGeneratorCodeService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 产品服务 -->
+	<bean id="productService"
+		class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${product.service.url}/loanProductService" />
+		<property name="serviceInterface" value="com.hehenian.common.product.ILoanProductService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 产品方案服务 -->
+	<bean id="loanProductSchemeService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${product.service.url}/loanProductSchemeService" />
+		<property name="serviceInterface" value="com.hehenian.common.product.ILoanProductSchemeService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 还款计划表计算器 -->
+	<bean id="settleCalculatorService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${repay.service.url}/settleCalculatorService" />
+		<property name="serviceInterface" value="com.hehenian.common.repay.ISettleCalculatorService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 文件服务 -->
+	<bean id="fileServerService" class="com.hehenian.common.file.impl.FileServerServiceImpl">
+		<property name="fileServerDir" value="${fileServer.storeDir}" />
+		<property name="fileAccessUrl" value="${fileServer.accessUrl}" />
+	</bean>
+	<!-- 读取合同路径 -->
+	<bean id="loanProtocolService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${order.service.url}/loanProtocolService" />
+		<property name="serviceInterface" value="com.hehenian.common.order.ILoanProtocolService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!--  彩之云接口,验证小区 -->
+	<bean id="colorHttpService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${third.service.url}/colorHttpService" />
+		<property name="serviceInterface" value="com.hehenian.common.third.IColorHttpService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	 <!-- 订单渠道用户信息表 -->
+	<bean name="loanChannelUserService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+			<property name="serviceUrl" value="${order.service.url}/loanChannelUserService" />
+			<property name="serviceInterface" value="com.hehenian.common.order.ILoanChannelUserService" />
+			<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 用户帐号贷款信息 -->
+	<bean id="loanCertificateService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${user.service.url}/loanCertificateService" />
+		<property name="serviceInterface" value="com.hehenian.common.account.ILoanCertificateService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 借款人验证表  -->
+	<bean id="loanPersonCheckService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${order.service.url}/loanPersonCheckService" />
+		<property name="serviceInterface" value="com.hehenian.common.order.ILoanPersonCheckService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 融资端站内通知发送 -->
+	<bean id="notifyLoanService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${sms.service.url}/notifyLoanService" />
+		<property name="serviceInterface" value="com.hehenian.common.sms.INotifyLoanService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+	<!-- 消息发送 -->
+	<bean id="notifyService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+		<property name="serviceUrl" value="${sms.service.url}/notifyService" />
+		<property name="serviceInterface" value="com.hehenian.common.sms.INotifyService" />
+		<property name="proxyFactory" ref="serviceProxy" />
+	</bean>
+</beans>
